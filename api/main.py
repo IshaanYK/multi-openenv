@@ -9,15 +9,19 @@ import app.tasks as tasks_module
 
 app = FastAPI(title="AI Work OS - Multi-Agent Intelligent Environment")
 
-# Mount static files
-static_dir = os.path.join(os.path.dirname(__file__), "..", "app", "static")
-app.mount("/static", StaticFiles(directory=static_dir), name="static")
+# Static File Mounting - Only check once
+STATIC_PATH = "static"
+if os.path.exists(STATIC_PATH):
+    app.mount("/static", StaticFiles(directory=STATIC_PATH), name="static")
 
 env = AIWorkOSEnv()
 
 @app.get("/", include_in_schema=False)
 def serve_index():
-    return FileResponse(os.path.join(static_dir, "index.html"))
+    index_path = os.path.join(STATIC_PATH, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "AI Work OS - Dashboard static files missing."}
 
 @app.get("/reset", response_model=EnvironmentState)
 @app.post("/reset", response_model=EnvironmentState)
@@ -58,14 +62,15 @@ def get_tasks():
 
 @app.get("/grader", response_model=GraderOutput)
 def get_graders():
-    # Return actual performance metrics from the environment
+    # Return actual performance metrics from the environment state
     metrics = env.state().performance_metrics
     return GraderOutput(
-        accuracy=metrics.get("accuracy", 0.8),
-        efficiency=metrics.get("efficiency", 0.7),
-        decision_quality=metrics.get("decision_quality", 0.9),
-        tool_usage=metrics.get("tool_usage", 0.8),
-        final_score=metrics.get("final_score", 0.82)
+        accuracy=metrics.get("overall_accuracy", 0.0),
+        efficiency=metrics.get("overall_efficiency", 0.0),
+        decision_quality=metrics.get("decision_quality", 0.0),
+        tool_usage=metrics.get("tool_usage", 0.0),
+        final_score=metrics.get("total_reward", 0.0),
+        feedback="Syncing performance from simulation engine..."
     )
 
 @app.get("/baseline")
