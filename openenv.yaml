@@ -1,0 +1,13 @@
+name: ai_work_os
+description: Multi-agent workplace simulation environment
+
+observation_space:
+  type: object
+
+action_space:
+  type: object
+
+tasks:
+  - email_classification
+  - scheduling
+  - multi_task_workflow
