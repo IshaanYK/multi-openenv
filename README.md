@@ -1,4 +1,17 @@
+---
+title: AI Work OS
+emoji: 🤖
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
+
 # AI Work OS – Multi-Agent Intelligent Environment
+
+
 
 ## Project Description
 AI Work OS is an advanced, production-grade OpenEnv environment that acts as a real-world workplace simulation. The system challenges AI agents to handle multiple concurrent tasks (e.g., email handling, scheduling, and customer support) amid dynamic conditions including strict deadlines, task prioritization, unpredictable interruptions, simulated tool failures, and noisy or ambiguous user inputs.
