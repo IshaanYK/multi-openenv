@@ -76,3 +76,5 @@ Penalties are distributed for repeating failed actions (-0.3 loops) and over-ste
    ```
 4. Access API definitions and interaction tests over the browser at: `http://localhost:7860/docs`.
 5. **Hugging Face Deployment:** Simply attach this structure inside a new Hugging Face Space using the preset SDK configured docker environment. Port `7860` is natively wrapped.
+
+http://127.0.0.1:7860
