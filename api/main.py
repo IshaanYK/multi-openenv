@@ -1,8 +1,9 @@
+print("🚀 App starting...") 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os
-from app.env import AIWorkOSEnv
+from app.env import AIWorkOSEnv import WorkEnv
 from app.models import AgentAction, EnvironmentState, StepResponse, GraderOutput
 from app.baseline import run_baseline
 import app.tasks as tasks_module
