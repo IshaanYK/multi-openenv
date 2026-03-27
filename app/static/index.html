@@ -29,11 +29,11 @@
         <!-- Left Column: Available Tasks & Action Form -->
         <section class="left-col">
             <div class="panel glass-panel">
-                <h2>System Tasks</h2>
+                <h2>Incoming Inbox</h2>
                 <div class="tasks-tabs">
-                    <button class="tab active" data-difficulty="easy">Easy</button>
-                    <button class="tab" data-difficulty="medium">Medium</button>
-                    <button class="tab" data-difficulty="hard">Hard</button>
+                    <button class="tab active" data-difficulty="easy">Priority</button>
+                    <button class="tab" data-difficulty="medium">Internal</button>
+                    <button class="tab" data-difficulty="hard">Escalation</button>
                 </div>
                 <div class="tasks-list-container" id="tasks-list">
                     <!-- Tasks will be injected here -->
@@ -41,45 +41,45 @@
             </div>
 
             <div class="panel glass-panel mt-4 action-panel">
-                <h2>Take Action</h2>
+                <h2>Execution Control</h2>
                 <form id="action-form">
                     <div class="form-group">
-                        <label>Task ID</label>
-                        <input type="text" id="action-task-id" placeholder="e.g. task_001" required>
+                        <label>Target Task ID</label>
+                        <input type="text" id="action-task-id" placeholder="e.g. REQ_101" required>
                     </div>
                     <div class="form-group">
-                        <label>Action Type</label>
+                        <label>Action Protocol</label>
                         <select id="action-type" required>
-                            <option value="classify">Classify</option>
-                            <option value="schedule">Schedule</option>
-                            <option value="refund">Refund</option>
-                            <option value="reply">Reply</option>
+                            <option value="classify">Analyze & Classify</option>
+                            <option value="schedule">Coordinate Meeting</option>
+                            <option value="refund">Process Transaction</option>
+                            <option value="reply">Compose Reply</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Tool</label>
+                        <label>Interface Tool</label>
                         <select id="action-tool" required>
-                            <option value="classify_text">classify_text</option>
-                            <option value="schedule_meeting">schedule_meeting</option>
-                            <option value="process_refund">process_refund</option>
-                            <option value="send_email">send_email</option>
+                            <option value="classify_text">Natural Language Parsing</option>
+                            <option value="schedule_meeting">Calender Integrator</option>
+                            <option value="process_refund">Payment Gateway</option>
+                            <option value="send_email">SMTP Relay</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Message / Note</label>
-                        <textarea id="action-message" rows="2" placeholder="Optional details..."></textarea>
+                        <label>Operational Rationale</label>
+                        <textarea id="action-message" rows="2" placeholder="Briefly explain the decision..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-full">Submit Action</button>
+                    <button type="submit" class="btn btn-primary btn-full">Dispatch Agent Action</button>
                 </form>
             </div>
         </section>
 
         <!-- Center Column: Environment State (Active Tasks) -->
         <section class="center-col">
-            <div class="panel glass-panel full-height">
-                <h2>Pending Environment Tasks</h2>
+            <div class="panel glass-panel">
+                <h2>Active Workplace Stack</h2>
                 <div id="env-tasks" class="env-tasks-grid">
-                    <p class="text-muted">Loading environment state...</p>
+                    <p class="text-muted">Initializing workspace...</p>
                 </div>
             </div>
         </section>
@@ -87,17 +87,17 @@
         <!-- Right Column: Metrics & Logs -->
         <section class="right-col">
             <div class="panel glass-panel">
-                <h2>Performance Metrics</h2>
+                <h2>Performance Tracing</h2>
                 <div class="metrics-grid" id="metrics-container">
                     <!-- Metrics will be injected here -->
-                    <p class="text-muted">No metrics yet.</p>
+                    <p class="text-muted">Standby for simulation.</p>
                 </div>
             </div>
 
             <div class="panel glass-panel mt-4 logs-panel">
-                <h2>Agent Logs</h2>
+                <h2>Agent Collaboration</h2>
                 <div class="logs-container" id="logs-container">
-                    <p class="text-muted">No logs recorded.</p>
+                    <p class="text-muted">Communications offline.</p>
                 </div>
             </div>
         </section>

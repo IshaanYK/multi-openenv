@@ -4,6 +4,7 @@ from typing import List, Optional, Literal, Dict, Any
 class TaskInput(BaseModel):
     task_id: str
     input: str
+    sender: str  # Added for humanization
     priority: Literal["low", "medium", "high"]
     deadline: int
     status: Literal["pending", "completed"]
@@ -20,6 +21,7 @@ class AgentLog(BaseModel):
     from_agent: str = Field(alias="from")
     to_agent: str = Field(alias="to")
     message: Optional[str] = ""
+    avatar: Optional[str] = None  # Added for humanization
 
 class EnvironmentState(BaseModel):
     tasks: List[TaskInput]
@@ -34,6 +36,7 @@ class GraderOutput(BaseModel):
     decision_quality: float
     tool_usage: float
     final_score: float
+    feedback: Optional[str] = ""  # Added for humanization
 
 class StepResponse(BaseModel):
     observation: EnvironmentState

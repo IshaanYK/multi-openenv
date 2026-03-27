@@ -6,25 +6,27 @@ from app.tasks import EASY_TASKS, MEDIUM_TASKS, HARD_TASKS
 from app.graders import get_grader
 
 class InternalAgent:
-    def __init__(self, role: str):
+    def __init__(self, role: str, name: str, avatar_id: int):
         self.role = role
+        self.name = name
+        self.avatar = f"https://i.pravatar.cc/150?u={avatar_id}"
 
     def evaluate(self, env_instance: Any, action: AgentAction) -> AgentLog:
         if self.role == "Planner":
-            return AgentLog(**{"from": "planner", "to": "executor", "message": f"Assigned tool '{action.tool}' for task sub-process."})
+            return AgentLog(**{"from": self.name, "to": "Jackson", "message": f"Strategy: I've validated the request. Proceed with {action.tool}.", "avatar": self.avatar})
         elif self.role == "Executor":
             status = "failed" if random.random() < 0.05 else "completed"
-            return AgentLog(**{"from": "executor", "to": "reviewer", "message": f"Action {action.action_type} using {action.tool}: {status}"})
+            return AgentLog(**{"from": self.name, "to": "Avery", "message": f"Ops: {action.action_type} using {action.tool} is {status}.", "avatar": self.avatar})
         elif self.role == "Reviewer":
-            msg = "Good logical execution." if action.reason else "Suggestion: Output reasoning to improve traceability."
-            return AgentLog(**{"from": "reviewer", "to": "planner", "message": msg})
-        return AgentLog(**{"from": "system", "to": "system", "message": "noop"})
+            msg = "Review: Execution looks perfect." if action.reason else "Review: Could use more detail in the 'reason' field next time."
+            return AgentLog(**{"from": self.name, "to": self.name, "message": msg, "avatar": self.avatar})
+        return AgentLog(**{"from": "System", "to": "System", "message": "noop", "avatar": None})
 
 class AIWorkOSEnv:
     def __init__(self):
-        self.planner = InternalAgent("Planner")
-        self.executor = InternalAgent("Executor")
-        self.reviewer = InternalAgent("Reviewer")
+        self.planner = InternalAgent("Planner", "Sophia", 11)
+        self.executor = InternalAgent("Executor", "Jackson", 22)
+        self.reviewer = InternalAgent("Reviewer", "Avery", 33)
         self.reset()
         
     def reset(self) -> EnvironmentState:

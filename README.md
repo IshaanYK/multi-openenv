@@ -5,9 +5,9 @@ AI Work OS is an advanced, production-grade OpenEnv environment that acts as a r
 
 ## Environment Architecture & Multi-Agent System
 The environment mimics complex real-world dynamics using an internal Multi-Agent subsystem that remains totally abstracted from the client:
-1. **Planner Agent:** Analyzes the task and assigns operational workflows by breaking down the complexity.
-2. **Executor Agent:** Dispatches the operations via selected core tools (`send_email`, `schedule_meeting`, `process_refund`, `classify_text`) ensuring simulated execution boundaries and error rates.
-3. **Reviewer Agent:** Ensures standard-of-quality via reasoning checks, loop detection to prevent agent paralysis, and metric tracing.
+1. **Sophia (Strategy):** Analyzes the task and assigns operational workflows by breaking down the complexity.
+2. **Jackson (Operations):** Dispatches the operations via selected core tools (`send_email`, `schedule_meeting`, `process_refund`, `classify_text`) ensuring simulated execution boundaries and error rates.
+3. **Avery (Quality Control):** Ensures standard-of-quality via reasoning checks, loop detection to prevent agent paralysis, and metric tracing.
 
 Agents interact through logged messages viewable strictly in the observation space under `agent_logs`.
 

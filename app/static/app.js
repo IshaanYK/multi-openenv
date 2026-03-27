@@ -32,11 +32,14 @@ function setupEventListeners() {
     });
 }
 
-function showToast(message, type = 'success') {
-    elToast.textContent = message;
-    elToast.style.borderLeftColor = type === 'error' ? '#ef4444' : '#10b981';
+function showToast(message, feedback = '') {
+    elToast.innerHTML = `
+        <div style="font-weight:700; margin-bottom: 0.25rem;">Simulation Pulse</div>
+        <div>${message}</div>
+        ${feedback ? `<div class="feedback-text">"${feedback}"</div>` : ''}
+    `;
     elToast.classList.add('show');
-    setTimeout(() => elToast.classList.remove('show'), 3000);
+    setTimeout(() => elToast.classList.remove('show'), 5000);
 }
 
 // Data Fetching
@@ -67,14 +70,14 @@ async function fetchState() {
 // Handlers
 async function handleReset(e) {
     const btn = e.target;
-    btn.textContent = 'Resetting...';
+    btn.textContent = 'Recalibrating...';
     try {
         const res = await fetch(`${API_BASE}/reset`, { method: 'POST' });
         const state = await res.json();
         updateDashboard(state);
-        showToast('Environment reset successful.');
+        showToast('Workplace environment has been reset.');
     } catch (err) {
-        showToast('Reset failed.', 'error');
+        showToast('Calibration failed.');
     } finally {
         btn.textContent = 'Reset Environment';
     }
@@ -84,10 +87,10 @@ async function handleBaseline() {
     try {
         const res = await fetch(`${API_BASE}/baseline`);
         const data = await res.json();
-        showToast(`Baseline Agent finished! Score: ${data.score.toFixed(2)}`);
+        showToast(`Baseline Run: Efficiency Score ${data.score.toFixed(2)}`);
         fetchState();
     } catch (err) {
-        showToast('Baseline run failed.', 'error');
+        showToast('Baseline trial failed.');
     }
 }
 
@@ -98,8 +101,8 @@ async function handleAction(e) {
         action_type: document.getElementById('action-type').value,
         tool: document.getElementById('action-tool').value,
         message: document.getElementById('action-message').value,
-        metadata: {},
-        reason: ""
+        reason: document.getElementById('action-message').value, // Use message as reason for grading
+        metadata: {}
     };
 
     try {
@@ -110,30 +113,35 @@ async function handleAction(e) {
         });
         const data = await res.json();
         updateDashboard(data.observation);
-        showToast(`Step processed! Reward: ${data.reward.toFixed(2)}`);
+        
+        const feedback = data.info.grader ? data.info.grader.feedback : '';
+        showToast(`Action Processed. Reward: ${data.reward.toFixed(2)}`, feedback);
+        
         document.getElementById('action-form').reset();
     } catch (err) {
-        showToast('Action failed.', 'error');
+        showToast('Operation rejected by environment.');
     }
 }
 
 // Rendering
 function renderSystemTasks(difficulty) {
-    // If the tasks in the new API don't have difficulty, we might need to handle that.
-    // Assuming for now they might have it, or we just show them.
     const tasks = allTasks.filter(t => !difficulty || t.difficulty === difficulty || difficulty === 'all');
     
     if (tasks.length === 0) {
-        elSystemTasksList.innerHTML = '<p class="text-muted">No tasks available.</p>';
+        elSystemTasksList.innerHTML = '<p class="text-muted">Inbox is currently empty.</p>';
         return;
     }
 
     elSystemTasksList.innerHTML = tasks.map(t => `
-        <div class="task-card" onclick="document.getElementById('action-task-id').value = '${t.id || t.task_id || ''}'" style="cursor: pointer;">
+        <div class="task-card" onclick="document.getElementById('action-task-id').value = '${t.task_id}'" style="cursor: pointer;">
             <div class="task-header">
-                <span class="task-id">${t.id || t.task_id || 'N/A'}</span>
+                <span class="task-sender">${t.sender || 'System'}</span>
+                <span class="priority-badge priority-${t.priority}">${t.priority}</span>
             </div>
-            <div class="task-input">${t.input || t.description || ''}</div>
+            <div class="task-input">${t.input}</div>
+            <div class="task-meta">
+                <span>Task: ${t.task_id}</span>
+            </div>
         </div>
     `).join('');
 }
@@ -144,18 +152,20 @@ function updateDashboard(state) {
     // Render Pending Tasks
     const pendingTasks = state.tasks.filter(t => t.status !== 'completed');
     if (pendingTasks.length === 0) {
-        elEnvTasksList.innerHTML = '<p class="text-muted">No pending tasks! Good job.</p>';
+        elEnvTasksList.innerHTML = '<div class="panel glass-panel" style="background: rgba(35, 134, 54, 0.05); text-align:center; padding: 2rem;">' +
+                                   '<div style="font-size: 2rem; margin-bottom: 1rem;">✨</div>' +
+                                   '<p>Workspace clear. All tasks finalized.</p></div>';
     } else {
         elEnvTasksList.innerHTML = pendingTasks.map(t => `
             <div class="task-card">
                 <div class="task-header">
-                    <span class="task-id">${t.task_id}</span>
+                    <span class="task-sender">${t.sender || 'Unknown'}</span>
                     <span class="priority-badge priority-${t.priority}">${t.priority}</span>
                 </div>
                 <div class="task-input">${t.input}</div>
                 <div class="task-meta">
-                    <span>Deadline: ${t.deadline}</span>
-                    <span>Status: ${t.status}</span>
+                    <span>${t.task_id}</span>
+                    <span>Deadline: ${t.deadline} steps</span>
                 </div>
             </div>
         `).join('');
@@ -163,26 +173,25 @@ function updateDashboard(state) {
 
     // Render Metrics
     const metrics = state.performance_metrics || {};
-    if (Object.keys(metrics).length === 0) {
-        elMetrics.innerHTML = '<p class="text-muted">No metrics yet.</p>';
-    } else {
-        elMetrics.innerHTML = Object.entries(metrics).map(([key, val]) => `
-            <div class="metric-box">
-                <div class="metric-value">${typeof val === 'number' ? val.toFixed(2) : val}</div>
-                <div class="metric-label">${key.replace(/_/g, ' ')}</div>
-            </div>
-        `).join('');
-    }
+    elMetrics.innerHTML = Object.entries(metrics).map(([key, val]) => `
+        <div class="metric-box">
+            <div class="metric-value">${typeof val === 'number' ? val.toFixed(2) : val}</div>
+            <div class="metric-label">${key.replace(/_/g, ' ')}</div>
+        </div>
+    `).join('');
 
-    // Render Logs
+    // Render Logs as Chat
     const logs = state.agent_logs || [];
     if (logs.length === 0) {
-        elLogs.innerHTML = '<p class="text-muted">No logs recorded.</p>';
+        elLogs.innerHTML = '<p class="text-muted">Waiting for collaboration...</p>';
     } else {
         elLogs.innerHTML = logs.slice().reverse().map(l => `
-            <div class="log-entry">
-                <div class="log-agents">${l.from || l.from_agent} → ${l.to || l.to_agent}</div>
-                <div class="log-msg">${l.message}</div>
+            <div class="chat-bubble">
+                <img src="${l.avatar || `https://i.pravatar.cc/150?u=${l.from_agent}`}" class="avatar" alt="avatar">
+                <div class="bubble-content">
+                    <div class="bubble-author">${l.from || l.from_agent}</div>
+                    <div class="bubble-msg">${l.message}</div>
+                </div>
             </div>
         `).join('');
     }

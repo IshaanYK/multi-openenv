@@ -9,7 +9,8 @@ def grade_easy_task(action: AgentAction, step_count: int, deadline: int) -> Grad
     
     final_score = (0.25 * accuracy + 0.20 * max(accuracy, 0) + 0.15 * efficiency + 0.15 * 0.5 + 0.10 * tool_usage + 0.10 * decision_quality + 0.05 * 1.0)
     
-    return GraderOutput(accuracy=accuracy, efficiency=efficiency, decision_quality=decision_quality, tool_usage=tool_usage, final_score=min(1.0, max(0.0, final_score)))
+    feedback = "Good start on the classification." if accuracy > 0.5 else "The classification intent was misunderstood."
+    return GraderOutput(accuracy=accuracy, efficiency=efficiency, decision_quality=decision_quality, tool_usage=tool_usage, final_score=min(1.0, max(0.0, final_score)), feedback=feedback)
 
 def grade_medium_task(action: AgentAction, step_count: int, deadline: int) -> GraderOutput:
     accuracy = 0.0
@@ -22,7 +23,8 @@ def grade_medium_task(action: AgentAction, step_count: int, deadline: int) -> Gr
     
     final_score = (0.25 * accuracy + 0.20 * max(accuracy, 0) + 0.15 * efficiency + 0.15 * 0.8 + 0.10 * tool_usage + 0.10 * decision_quality + 0.05 * 1.0)
     
-    return GraderOutput(accuracy=accuracy, efficiency=efficiency, decision_quality=decision_quality, tool_usage=tool_usage, final_score=min(1.0, max(0.0, final_score)))
+    feedback = "Solid scheduling effort, Sophia." if accuracy > 0.5 else "Incomplete action for a medium-priority task."
+    return GraderOutput(accuracy=accuracy, efficiency=efficiency, decision_quality=decision_quality, tool_usage=tool_usage, final_score=min(1.0, max(0.0, final_score)), feedback=feedback)
 
 def grade_hard_task(action: AgentAction, step_count: int, deadline: int) -> GraderOutput:
     accuracy = 0.0
@@ -39,7 +41,8 @@ def grade_hard_task(action: AgentAction, step_count: int, deadline: int) -> Grad
     
     final_score = (0.25 * accuracy + 0.20 * max(accuracy, 0) + 0.15 * efficiency + 0.15 * 1.0 + 0.10 * tool_usage + 0.10 * decision_quality + 0.05 * 1.0)
     
-    return GraderOutput(accuracy=accuracy, efficiency=efficiency, decision_quality=decision_quality, tool_usage=tool_usage, final_score=min(1.0, max(0.0, final_score)))
+    feedback = "Excellent handling of the refund escalation!" if accuracy > 0.6 else "The customer ops request wasn't fully addressed."
+    return GraderOutput(accuracy=accuracy, efficiency=efficiency, decision_quality=decision_quality, tool_usage=tool_usage, final_score=min(1.0, max(0.0, final_score)), feedback=feedback)
 
 def get_grader(task_id: str):
     if "easy" in task_id: return grade_easy_task
