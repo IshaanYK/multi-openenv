@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.env.*
+*.egg-info/
+dist/
+build/
+.DS_Store
+data/memory.json
+.pytest_cache/
+*.log
+multi-api-ai/
+api/agents/

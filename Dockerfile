@@ -1,10 +1,16 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 WORKDIR /app
 
+# Copy and install dependencies first (leverages Docker layer cache)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app code
 COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Create data directory for memory persistence
+RUN mkdir -p /app/data
 
 EXPOSE 7860
 
