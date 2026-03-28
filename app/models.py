@@ -4,7 +4,7 @@ from typing import List, Optional, Literal, Dict, Any
 class TaskInput(BaseModel):
     task_id: str
     input: str
-    sender: str  # Added for humanization
+    sender: str
     priority: Literal["low", "medium", "high"]
     deadline: int
     status: Literal["pending", "completed"]
@@ -21,7 +21,7 @@ class AgentLog(BaseModel):
     from_agent: str = Field(alias="from")
     to_agent: str = Field(alias="to")
     message: Optional[str] = ""
-    avatar: Optional[str] = None  # Added for humanization
+    avatar: Optional[str] = None
 
 class EnvironmentState(BaseModel):
     tasks: List[TaskInput]
@@ -36,10 +36,70 @@ class GraderOutput(BaseModel):
     decision_quality: float
     tool_usage: float
     final_score: float
-    feedback: Optional[str] = ""  # Added for humanization
+    feedback: Optional[str] = ""
 
 class StepResponse(BaseModel):
     observation: EnvironmentState
     reward: float
     done: bool
     info: Dict[str, Any]
+
+# ─── Multi-Agent Pipeline Models ─────────────────────────────────
+
+class ClassifierResult(BaseModel):
+    agent: str
+    category: str
+    priority: str
+    confidence: float
+    reasoning: str
+    used_llm: bool = False
+
+class PlannerResult(BaseModel):
+    agent: str
+    action_type: str
+    tool: str
+    secondary_tool: Optional[str] = None
+    steps: List[str]
+    plan_summary: str
+    confidence: float
+
+class ExecutorResult(BaseModel):
+    agent: str
+    status: str
+    reward: float
+    final_score: float
+    feedback: str
+    elapsed_ms: float
+    done: bool
+
+class PipelineResult(BaseModel):
+    task_id: str
+    task_text: str
+    total_ms: float
+
+    # Stage results
+    classifier: Dict[str, Any]
+    planner: Dict[str, Any]
+    executor: Dict[str, Any]
+
+    # Top-level summary
+    category: str
+    priority: str
+    action: str
+    steps: List[str]
+    tool: str
+    reasoning: str
+    feedback: str
+    status: str
+    used_llm: bool = False
+    memory_hint: Optional[str] = None
+
+    # Metrics
+    accuracy: float
+    efficiency: float
+    reward: float
+    confidence: float
+
+    # Environment
+    observation: Optional[EnvironmentState] = None
+    done: bool = False

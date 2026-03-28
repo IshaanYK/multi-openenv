@@ -1,0 +1,52 @@
+[
+  {
+    "timestamp": "2026-03-27T19:10:45.946783",
+    "task_id": "REQ_303",
+    "task_text": "Please refund order #123 immediately and schedule a follow-up call for tomorrow morning. The customer is frustrated.",
+    "category": "escalation",
+    "tool": "process_refund",
+    "status": "completed",
+    "reward": 0.8283,
+    "feedback": "Excellent escalation handling!"
+  },
+  {
+    "timestamp": "2026-03-27T19:13:55.445131",
+    "task_id": "REQ_101",
+    "task_text": "Hey, I need to schedule a meeting for tomorrow. Just a quick sync.",
+    "category": "meeting",
+    "tool": "schedule_meeting",
+    "status": "completed",
+    "reward": 0.98,
+    "feedback": "Great scheduling response!"
+  },
+  {
+    "timestamp": "2026-03-27T19:14:18.906120",
+    "task_id": "REQ_101",
+    "task_text": "Hey, I need to schedule a meeting for tomorrow. Just a quick sync.",
+    "category": "meeting",
+    "tool": "schedule_meeting",
+    "status": "failed",
+    "reward": -0.8,
+    "feedback": "No feedback available."
+  },
+  {
+    "timestamp": "2026-03-27T19:14:48.437186",
+    "task_id": "REQ_101",
+    "task_text": "Hey, I need to schedule a meeting for tomorrow. Just a quick sync.",
+    "category": "meeting",
+    "tool": "schedule_meeting",
+    "status": "failed",
+    "reward": -0.8,
+    "feedback": "No feedback available."
+  },
+  {
+    "timestamp": "2026-03-27T19:15:42.770889",
+    "task_id": "REQ_202",
+    "task_text": "Can you schedule a meeting with John at 5pm? It's pretty urgent.",
+    "category": "meeting",
+    "tool": "schedule_meeting",
+    "status": "completed",
+    "reward": 0.84,
+    "feedback": "Solid scheduling! Jackson handled it well."
+  }
+]

@@ -3,46 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Work OS Dashboard</title>
+    <title>AI Work OS — Multi-Agent Dashboard</title>
+    <meta name="description" content="AI Work OS — Intelligent Multi-Agent Workplace Simulation">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div class="glass-bg"></div>
-    
+
+    <!-- Navbar -->
     <header class="navbar glass-panel">
         <div class="logo">
             <div class="logo-icon"></div>
             <h1>AI Work OS</h1>
+            <span class="logo-badge">MULTI-AGENT</span>
         </div>
         <div class="header-actions">
             <div class="step-badge">Step: <span id="env-step">-</span></div>
-            <button id="btn-baseline" class="btn btn-secondary">Run Baseline Agent</button>
-            <button id="btn-reset" class="btn btn-primary">Reset Environment</button>
+            <button id="btn-baseline" class="btn btn-secondary">Run Baseline</button>
+            <button id="btn-reset" class="btn btn-primary">Reset</button>
         </div>
     </header>
 
     <main class="dashboard-grid">
-        
-        <!-- Left Column: Available Tasks & Action Form -->
+
+        <!-- Left: Inbox + Execution -->
         <section class="left-col">
-            <div class="panel glass-panel">
+            <div class="panel">
                 <h2>Incoming Inbox</h2>
                 <div class="tasks-tabs">
                     <button class="tab active" data-difficulty="easy">Priority</button>
                     <button class="tab" data-difficulty="medium">Internal</button>
                     <button class="tab" data-difficulty="hard">Escalation</button>
                 </div>
-                <div class="tasks-list-container" id="tasks-list">
-                    <!-- Tasks will be injected here -->
-                </div>
+                <div class="tasks-list-container" id="tasks-list"></div>
             </div>
 
-            <div class="panel glass-panel mt-4 action-panel">
+            <div class="panel action-panel">
                 <h2>Execution Control</h2>
-                <form id="action-form">
+                <button id="btn-run-pipeline" class="btn btn-accent btn-full pipeline-btn">
+                    ⚡ Run Full Agent Pipeline
+                </button>
+                <button id="btn-run-agent" class="btn btn-ghost btn-full" style="margin-top:0.5rem">
+                    🔍 Classify Only
+                </button>
+
+                <form id="action-form" style="margin-top:1rem">
                     <div class="form-group">
                         <label>Target Task ID</label>
                         <input type="text" id="action-task-id" placeholder="e.g. REQ_101" required>
@@ -60,53 +68,97 @@
                         <label>Interface Tool</label>
                         <select id="action-tool" required>
                             <option value="classify_text">Natural Language Parsing</option>
-                            <option value="schedule_meeting">Calender Integrator</option>
+                            <option value="schedule_meeting">Calendar Integrator</option>
                             <option value="process_refund">Payment Gateway</option>
                             <option value="send_email">SMTP Relay</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Operational Rationale</label>
+                        <label>Rationale</label>
                         <textarea id="action-message" rows="2" placeholder="Briefly explain the decision..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-full">Dispatch Agent Action</button>
+                    <button type="submit" class="btn btn-primary btn-full">Dispatch Manually</button>
                 </form>
             </div>
         </section>
 
-        <!-- Center Column: Environment State (Active Tasks) -->
+        <!-- Center: Pipeline + Active Tasks -->
         <section class="center-col">
-            <div class="panel glass-panel">
+
+            <!-- Pipeline Visualization -->
+            <div class="panel pipeline-panel" id="pipeline-panel">
+                <h2>Agent Pipeline</h2>
+                <div class="pipeline-flow">
+                    <div class="pipeline-stage" id="stage-classify">
+                        <div class="stage-icon">🧠</div>
+                        <div class="stage-label">Sophia<br><small>Classifier</small></div>
+                        <div class="stage-output" id="stage-classify-output">Waiting...</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage" id="stage-plan">
+                        <div class="stage-icon">📋</div>
+                        <div class="stage-label">Jackson<br><small>Planner</small></div>
+                        <div class="stage-output" id="stage-plan-output">Waiting...</div>
+                    </div>
+                    <div class="pipeline-arrow">→</div>
+                    <div class="pipeline-stage" id="stage-exec">
+                        <div class="stage-icon">⚡</div>
+                        <div class="stage-label">Avery<br><small>Executor</small></div>
+                        <div class="stage-output" id="stage-exec-output">Waiting...</div>
+                    </div>
+                </div>
+
+                <!-- Reasoning Output -->
+                <div id="pipeline-result" class="pipeline-result hidden">
+                    <div class="result-header">
+                        <span id="result-status-badge"></span>
+                        <span id="result-timing" class="timing-badge"></span>
+                        <span id="result-llm-badge" class="llm-badge hidden">🤖 LLM</span>
+                    </div>
+                    <div class="result-steps" id="result-steps"></div>
+                    <div class="result-feedback" id="result-feedback"></div>
+                    <div class="memory-hint" id="memory-hint"></div>
+                </div>
+            </div>
+
+            <!-- Active Tasks -->
+            <div class="panel">
                 <h2>Active Workplace Stack</h2>
                 <div id="env-tasks" class="env-tasks-grid">
                     <p class="text-muted">Initializing workspace...</p>
                 </div>
             </div>
+
         </section>
 
-        <!-- Right Column: Metrics & Logs -->
+        <!-- Right: Metrics, Memory, Logs -->
         <section class="right-col">
-            <div class="panel glass-panel">
+            <div class="panel">
                 <h2>Performance Tracing</h2>
                 <div class="metrics-grid" id="metrics-container">
-                    <!-- Metrics will be injected here -->
                     <p class="text-muted">Standby for simulation.</p>
                 </div>
             </div>
 
-            <div class="panel glass-panel mt-4 logs-panel">
+            <div class="panel">
+                <h2>Memory System</h2>
+                <div id="memory-stats" class="memory-stats">
+                    <p class="text-muted">No memory entries yet.</p>
+                </div>
+                <div class="logs-container" id="memory-log" style="margin-top:0.75rem; max-height: 120px;"></div>
+            </div>
+
+            <div class="panel logs-panel">
                 <h2>Agent Collaboration</h2>
                 <div class="logs-container" id="logs-container">
-                    <p class="text-muted">Communications offline.</p>
+                    <p class="text-muted">Awaiting agent activity...</p>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Notification Toast -->
     <div id="toast" class="toast"></div>
-
     <script src="/static/app.js"></script>
 </body>
 </html>
