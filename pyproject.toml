@@ -9,8 +9,12 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "pydantic",
-    "requests"
+    "requests",
+    "openenv-core>=0.2.0"
 ]
+
+[project.scripts]
+server = "api.main:app"
 
 [tool.openenv]
 entrypoint = "api.main:app"
