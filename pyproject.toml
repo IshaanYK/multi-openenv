@@ -1,0 +1,16 @@
+[project]
+name = "ai-work-os"
+version = "0.1.0"
+description = "Multi-agent OpenEnv environment for real-world task simulation"
+authors = [
+    { name = "Ishaan Sen" }
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "requests"
+]
+
+[tool.openenv]
+entrypoint = "api.main:app"
