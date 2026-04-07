@@ -17,27 +17,55 @@ Flow:
 
 import sys
 import time
-import requests
+import json
+import urllib.request
+from urllib.error import URLError, HTTPError
 
 BASE_URL = "http://localhost:7860"
 
 
+def _make_request(method, endpoint, data=None, max_retries=5):
+    url = f"{BASE_URL}{endpoint}"
+    for attempt in range(max_retries):
+        try:
+            if data is not None:
+                req_data = json.dumps(data).encode('utf-8')
+            else:
+                req_data = None
+            req = urllib.request.Request(url, data=req_data, method=method)
+            req.add_header('Content-Type', 'application/json')
+            with urllib.request.urlopen(req, timeout=30) as response:
+                return json.loads(response.read().decode('utf-8'))
+        except HTTPError as e:
+            try:
+                err_msg = e.read().decode('utf-8')[:200]
+            except Exception:
+                err_msg = ""
+            print(f"    ⚠ HTTPError {e.code}: {err_msg}")
+            if e.code >= 500:
+                time.sleep(2)
+                continue
+            raise
+        except URLError as e:
+            print(f"    ⚠ URLError: {e.reason}")
+            time.sleep(2)
+            continue
+        except Exception as e:
+            print(f"    ⚠ Error: {e}")
+            time.sleep(2)
+            continue
+    raise Exception(f"Failed to fetch {url} after {max_retries} retries.")
+
 def reset():
-    resp = requests.post(f"{BASE_URL}/reset", timeout=30)
-    resp.raise_for_status()
-    return resp.json()
+    return _make_request("POST", "/reset")
 
 
 def step(action: dict):
-    resp = requests.post(f"{BASE_URL}/step", json=action, timeout=30)
-    resp.raise_for_status()
-    return resp.json()
+    return _make_request("POST", "/step", data=action)
 
 
 def get_grader():
-    resp = requests.get(f"{BASE_URL}/grader", timeout=30)
-    resp.raise_for_status()
-    return resp.json()
+    return _make_request("GET", "/grader")
 
 
 def best_action(task: dict) -> dict:
@@ -97,7 +125,12 @@ def run_inference():
 
     # ── 1. Reset ──────────────────────────────────────────────────
     print("\n[1] Resetting environment …")
-    state = reset()
+    try:
+        state = reset()
+    except Exception as e:
+        print(f"    ⚠ Failed to reset environment: {e}")
+        return 1
+
     tasks = state.get("tasks", [])
     print(f"    ✓ {len(tasks)} tasks received:")
     for t in tasks:
@@ -128,8 +161,8 @@ def run_inference():
 
         try:
             result = step(action)
-        except requests.HTTPError as e:
-            print(f"    ⚠ HTTP {e.response.status_code} on step {step_num}: {e.response.text[:200]}")
+        except Exception as e:
+            print(f"    ⚠ Request Error on step {step_num}: {e}")
             break
 
         # Update local task list from observation
